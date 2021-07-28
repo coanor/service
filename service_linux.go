@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -143,7 +144,7 @@ var tf = map[string]interface{}{
 	},
 }
 
-func createSysconfig(name string, envs map[string]string) {
+func createSysconfig(name string, envs map[string]string) error {
 	if err := os.MkdirAll("/etc/sysconfig", os.ModePerm); err != nil {
 		return err
 	}
@@ -158,4 +159,6 @@ func createSysconfig(name string, envs map[string]string) {
 		os.ModePerm); err != nil {
 		return err
 	}
+
+	return nil
 }
