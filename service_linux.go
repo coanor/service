@@ -35,15 +35,16 @@ func (sc linuxSystemService) New(i Interface, c *Config) (Service, error) {
 }
 
 func init() {
-	ChooseSystem(linuxSystemService{
-		name:   "linux-systemd",
-		detect: isSystemd,
-		interactive: func() bool {
-			is, _ := isInteractive()
-			return is
+	ChooseSystem(
+		linuxSystemService{
+			name:   "linux-systemd",
+			detect: isSystemd,
+			interactive: func() bool {
+				is, _ := isInteractive()
+				return is
+			},
+			new: newSystemdService,
 		},
-		new: newSystemdService,
-	},
 		linuxSystemService{
 			name:   "linux-upstart",
 			detect: isUpstart,
@@ -140,4 +141,21 @@ var tf = map[string]interface{}{
 	"cmdEscape": func(s string) string {
 		return strings.Replace(s, " ", `\x20`, -1)
 	},
+}
+
+func createSysconfig(name string, envs map[string]string) {
+	if err := os.MkdirAll("/etc/sysconfig", os.ModePerm); err != nil {
+		return err
+	}
+
+	buf := []string{}
+	for k, v := range envs {
+		buf = append(buf, fmt.Sprintf(`%s="%s"`, k, v))
+	}
+
+	if err := ioutil.WriteFile(filepath.Join("/etc/sysconfig", name),
+		[]byte(strings.Join(buf, "\n")),
+		os.ModePerm); err != nil {
+		return err
+	}
 }

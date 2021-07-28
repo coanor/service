@@ -134,6 +134,9 @@ type Config struct {
 
 	// System specific options.
 	Option KeyValue
+
+	// Environments settings
+	Envs map[string]string
 }
 
 var (

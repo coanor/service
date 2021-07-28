@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"os/signal"
 	"path/filepath"
@@ -145,6 +146,13 @@ func (s *systemd) Install() error {
 	_, err = os.Stat(confPath)
 	if err == nil {
 		return fmt.Errorf("Init already exists: %s", confPath)
+	}
+
+	// create EnvironmentFile file /etc/sysconfig/{{.Name}}
+	if s.Config.Envs == nil {
+		if err := createSysconfig(s.Config.Name, s.Config.Envs); err != nil {
+			return err
+		}
 	}
 
 	f, err := os.OpenFile(confPath, os.O_WRONLY|os.O_CREATE, 0644)
@@ -289,7 +297,7 @@ func (s *systemd) runAction(action string) error {
 const systemdScript = `[Unit]
 Description={{.Description}}
 ConditionFileIsExecutable={{.Path|cmdEscape}}
-{{range $i, $dep := .Dependencies}} 
+{{range $i, $dep := .Dependencies}}
 {{$dep}} {{end}}
 
 [Service]
