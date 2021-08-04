@@ -289,8 +289,8 @@ var launchdConfig = `<?xml version='1.0' encoding='UTF-8'?>
     <key>Disabled</key>
     <false/>
 
-   <key>EnvironmentVariables</key>
    {{if .Config.Envs}}
+   <key>EnvironmentVariables</key>
    <dict>
    {{ range $key, $value := .Config.Envs }}
      <key>{{ $key }}</key>
